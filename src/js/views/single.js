@@ -1,26 +1,33 @@
-import React, { useState, useEffect, useContext } from "react";
-import PropTypes from "prop-types";
-import { Link, useParams } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import "../../styles/home.css";
+import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
+import ContactCard from "../component/ContactC";
 
-export const Single = props => {
-	const { store, actions } = useContext(Context);
-	const params = useParams();
-	return (
-		<div className="jumbotron">
-			<h1 className="display-4">This will show the demo element: {store.demo[params.theid].title}</h1>
+export const Home = () => {
+    const { store, actions } = useContext(Context);
 
-			<hr className="my-4" />
+    useEffect(() => {
+        const initializeAgenda = async () => {
+            await actions.createUser();
+            actions.getContacts();
+        };
 
-			<Link to="/">
-				<span className="btn btn-primary btn-lg" href="#" role="button">
-					Back home
-				</span>
-			</Link>
-		</div>
-	);
-};
+        initializeAgenda();
+    }, []);
 
-Single.propTypes = {
-	match: PropTypes.object
+    return (
+        <div className="container">
+            <div className="mb-4 d-flex">
+                <Link className="ms-auto" to="/AddContact">
+                    <button className="btn btn-success">Add contact</button>
+                </Link>
+            </div>
+            <ul className="list-unstyled">
+                {store.contacts && store.contacts.map((contact, index) => (
+                    <ContactCard key={index} contact={contact} onDelete={actions.deleteContact} />
+                ))}
+            </ul>
+        </div>
+    );
 };
